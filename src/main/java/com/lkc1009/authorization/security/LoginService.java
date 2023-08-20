@@ -8,13 +8,16 @@ import com.lkc1009.authorization.util.JwtUtils;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 自定义登录逻辑
@@ -25,6 +28,7 @@ import java.util.Objects;
 public class LoginService {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final RedisTemplate<Object, Object> redisTemplate;
 
     public String login(String username, String password) {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(username, password);
@@ -39,11 +43,22 @@ public class LoginService {
         User user = (User) authentication.getPrincipal();
 
         long expiration = System.currentTimeMillis() + 1000 * 60 * 60 * 2;
-        return JwtUtils.createJwt(String.valueOf(IdWorker.getId())
+        String token = JwtUtils.createJwt(String.valueOf(IdWorker.getId())
                 ,user.getUsername()
                 ,new Date(expiration)
                 , SignatureAlgorithm.HS512
                 ,JwtUtils.base64EncodedSecretKey
         );
+
+        redisTemplate.opsForValue()
+                .set("login:user:" + user.getId(), token, expiration, TimeUnit.MILLISECONDS);
+
+        return token;
+    }
+
+    public String logout() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        redisTemplate.delete("login:user:" + user.getId());
+        return "退出成功";
     }
 }

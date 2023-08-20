@@ -23,4 +23,9 @@ public class AuthorizationController {
     public String login(String username, String password) {
         return loginService.login(username, password);
     }
+
+    @PostMapping("/logout")
+    public String logout() {
+        return loginService.logout();
+    }
 }

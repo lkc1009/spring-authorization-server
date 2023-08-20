@@ -1,6 +1,7 @@
 package com.lkc1009.authorization.user;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.lkc1009.authorization.exception.AuthenticationSecurityException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -26,14 +27,14 @@ public class UserService implements UserDetailsService {
                 .eq(User::getUsername, username));
 
         if (Objects.isNull(user)) {
-            throw new RuntimeException("用户名不存在");
+            throw new AuthenticationSecurityException("用户名不存在");
         }
 
         Set<Authorities> authoritiesSet = Set.copyOf(authoritiesMapper.selectList(new LambdaQueryWrapper<Authorities>()
                 .eq(Authorities::getUsername, username)));
 
         if (authoritiesSet.isEmpty()) {
-            throw new RuntimeException("用户没有权限");
+            throw new AuthenticationSecurityException("用户没有权限");
         }
 
         user.setRoles(authoritiesSet.stream().map(Authorities::getAuthority).collect(Collectors.toSet()));
