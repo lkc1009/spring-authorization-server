@@ -1,9 +1,9 @@
 package com.lkc1009.authorization.security;
 
-import com.lkc1009.authorization.filter.JwtAuthenticationTokenFilter;
-import com.lkc1009.authorization.handler.AccessDeniedSecurityHandler;
-import com.lkc1009.authorization.handler.AuthenticationSecurityEntryPoint;
-import com.lkc1009.authorization.user.UserService;
+//import com.lkc1009.authorization.filter.JwtAuthenticationTokenFilter;
+//import com.lkc1009.authorization.handler.AccessDeniedSecurityHandler;
+//import com.lkc1009.authorization.handler.AuthenticationSecurityEntryPoint;
+//import com.lkc1009.authorization.user.UserService;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
@@ -22,6 +22,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -48,16 +49,16 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * security配置类
+ * security 配置类
  */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
-    private final UserService userService;
-    private final AccessDeniedSecurityHandler accessDeniedSecurityHandler;
-    private final AuthenticationSecurityEntryPoint authenticationSecurityEntryPoint;
-    private final JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
+//    private final UserService userService;
+//    private final AccessDeniedSecurityHandler accessDeniedSecurityHandler;
+//    private final AuthenticationSecurityEntryPoint authenticationSecurityEntryPoint;
+//    private final JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
     /**
      * 密码加密方式
      * @return passwordEncoder
@@ -74,7 +75,8 @@ public class SecurityConfiguration {
     @Bean
     public UserDetailsService userDetailsService() {
         var user = User.withUsername("user")
-                .password(passwordEncoder().encode("123456"))
+                // 密文
+                .password("$2a$10$WMkKx7wwlAwegIOU3MHFfuo9lemdGp380FB12rJ3Sis89V8IA3GiK")
                 .roles("USER")
                 .build();
         // 内存中添加一个用户
@@ -86,6 +88,8 @@ public class SecurityConfiguration {
      * 此处方法与下面 defaultSecurityFilterChain 都是 SecurityFilterChain 配置，配置的内容有点区别，
      * 因为 Spring Authorization Server 是建立在 Spring Security 基础上的，defaultSecurityFilterChain 方法主要
      * 配置 Spring Security 相关的东西，而此处 authorizationServerSecurityFilterChain 方法主要配置 OAuth 2.1 和 OpenID Connect 1.0 相关的东西
+     * OpenID connect 1.0 认证服务器信息地址 项目路径 + /.well-known/openid-configuration
+     * 引用 OidcProviderConfigurationEndpointFilter
      * @return securityFilterChain
      */
     @Bean
@@ -118,18 +122,18 @@ public class SecurityConfiguration {
         // security 配置
         return httpSecurity
 //                .userDetailsService(userService)
-                // http拦截
+                // http 拦截
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry
                                 // 放行 /login
 //                                .requestMatchers("/authorization/login").anonymous()
 //                                .requestMatchers("/**").hasRole("USER")
-                                .anyRequest().permitAll())
-                // http认证方式
+                                .anyRequest().authenticated())
+                // http 认证方式
 //                .httpBasic(Customizer.withDefaults())
                 // form login
                 .formLogin(Customizer.withDefaults())
-                // 禁用csrf
+                // 禁用 csrf
 //                .csrf(AbstractHttpConfigurer::disable)
 //                .exceptionHandling(httpSecurityExceptionHandlingConfigurer ->
 //                        httpSecurityExceptionHandlingConfigurer
@@ -139,11 +143,16 @@ public class SecurityConfiguration {
                 .build();
     }
 
+    /**
+     * org.springframework.security.oauth2.server.authorization 持久化
+     * @return registeredClientRepository
+     */
     @Bean
     public RegisteredClientRepository registeredClientRepository() {
         RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("oidc-client")
-                .clientSecret("{noop}123456")
+                // 密文
+                .clientSecret("$2a$10$WMkKx7wwlAwegIOU3MHFfuo9lemdGp380FB12rJ3Sis89V8IA3GiK")
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantTypes(authorizationGrantTypes ->
                         authorizationGrantTypes.addAll(List.of(
@@ -152,7 +161,7 @@ public class SecurityConfiguration {
                         )
                     )
                 )
-                .redirectUri("www.baidu.com")
+                .redirectUri("http://www.baidu.com")
                 .postLogoutRedirectUri("http://127.0.0.1:8080/")
                 .scopes(strings ->
                         strings.addAll(List.of(
