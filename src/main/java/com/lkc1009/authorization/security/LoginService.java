@@ -1,8 +1,11 @@
 package com.lkc1009.authorization.security;
 
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.lkc1009.authorization.DaoAuthenticationProvider;
 import com.lkc1009.authorization.user.User;
 import com.lkc1009.authorization.user.UserService;
+import com.lkc1009.authorization.util.JwtUtils;
+import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -10,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -33,6 +37,13 @@ public class LoginService {
         }
 
         User user = (User) authentication.getPrincipal();
-        return user.getUsername();
+
+        long expiration = System.currentTimeMillis() + 1000 * 60 * 60 * 2;
+        return JwtUtils.createJwt(String.valueOf(IdWorker.getId())
+                ,user.getUsername()
+                ,new Date(expiration)
+                , SignatureAlgorithm.HS512
+                ,JwtUtils.base64EncodedSecretKey
+        );
     }
 }

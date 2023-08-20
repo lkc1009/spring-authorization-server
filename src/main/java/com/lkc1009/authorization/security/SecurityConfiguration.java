@@ -1,6 +1,7 @@
 package com.lkc1009.authorization.security;
 
 import com.lkc1009.authorization.handler.AccessDeniedSecurityHandler;
+import com.lkc1009.authorization.handler.AuthenticationSecurityEntryPoint;
 import com.lkc1009.authorization.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -26,6 +27,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfiguration {
     private final UserService userService;
     private final AccessDeniedSecurityHandler accessDeniedSecurityHandler;
+    private final AuthenticationSecurityEntryPoint authenticationSecurityEntryPoint;
     /**
      * 密码加密方式
      * @return passwordEncoder
@@ -60,8 +62,8 @@ public class SecurityConfiguration {
                 // http拦截
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry
-                                // 放行/login
-                                .requestMatchers("/login").anonymous()
+                                // 放行 /login
+                                .requestMatchers("/authorization/login").anonymous()
                                 .requestMatchers("/**").hasRole("USER"))
                 // http认证方式
                 .httpBasic(Customizer.withDefaults())
@@ -69,7 +71,8 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(httpSecurityExceptionHandlingConfigurer ->
                         httpSecurityExceptionHandlingConfigurer
-                                .accessDeniedHandler(accessDeniedSecurityHandler))
+                                .accessDeniedHandler(accessDeniedSecurityHandler)
+                                .authenticationEntryPoint(authenticationSecurityEntryPoint))
                 .build();
     }
 }
