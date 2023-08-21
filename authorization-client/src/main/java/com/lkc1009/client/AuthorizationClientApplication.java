@@ -1,4 +1,4 @@
-package com.lkc1009.authiorzation;
+package com.lkc1009.client;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
