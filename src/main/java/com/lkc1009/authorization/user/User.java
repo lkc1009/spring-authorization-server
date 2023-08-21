@@ -30,6 +30,12 @@ public class User implements UserDetails {
     @TableField(exist = false)
     private Set<String> roles = new HashSet<>();
 
+    public User(String username, String password, Set<? extends GrantedAuthority> authorities) {
+        this.username = username;
+        this.password = password;
+        this.roles = authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
+    }
+
     /**
      * 用户权限
      * @return authorization
