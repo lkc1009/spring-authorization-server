@@ -1,0 +1,36 @@
+server:
+  address: 127.0.0.1
+  port: 8081
+
+spring:
+  application:
+    name: authorization-client
+
+  security:
+    oauth2:
+      client:
+        provider:
+          oauth2-server:
+            issuer-uri: http://spring-oauth-server:8080
+            authentication-uri: ${spring.security.oauth2.client.provider.oauth2-server.issuer-uri}/oauth/authorize
+            token-uri: ${spring.security.oauth2.client.provider.oauth2-server.issuer-uri}/oauth2/token
+          registration:
+            messageing-client-oidc:
+              provider: oauth2-server
+              client-name: messageing-client
+              # 客户端 ID
+              client-id: messageing-client
+              # 客户端 secret
+              client-secret: $2a$10$WMkKx7wwlAwegIOU3MHFfuo9lemdGp380FB12rJ3Sis89V8IA3GiK
+              # 客户端认证方式
+              client-authentication-method: client_secret_basic
+              # 授权方式
+              authoriaztion-grant-type: authorization_code
+              redirect-uri: http://spring-oauth-client:8081/login/oauth2/code/messageing-oidc
+              scope:
+                - profile
+                - openid
+
+logging:
+  level:
+    org.springframework.security: trace
