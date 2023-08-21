@@ -30,26 +30,46 @@ public class User implements UserDetails {
     @TableField(exist = false)
     private Set<String> roles = new HashSet<>();
 
+    /**
+     * 用户权限
+     * @return authorization
+     */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return AuthorityUtils.commaSeparatedStringToAuthorityList(getRoles().stream().map(r -> "ROLE_" + r).collect(Collectors.joining()));
     }
 
+    /**
+     * 用户账号过期状态
+     * @return boolean
+     */
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
+    /**
+     * 用户账号锁定状态
+     * @return boolean
+     */
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
+    /**
+     * 用户密码过期状态
+     * @return boolean
+     */
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
+    /**
+     * 用户禁用状态
+     * @return boolean
+     */
     @Override
     public boolean isEnabled() {
         return true;

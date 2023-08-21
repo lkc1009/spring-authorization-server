@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -28,7 +29,12 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationConsentService;
+import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
@@ -72,16 +78,16 @@ public class SecurityConfiguration {
      * 用户信息
      * @return userDetailsService
      */
-    @Bean
-    public UserDetailsService userDetailsService() {
-        var user = User.withUsername("user")
-                // 密文
-                .password("$2a$10$WMkKx7wwlAwegIOU3MHFfuo9lemdGp380FB12rJ3Sis89V8IA3GiK")
-                .roles("USER")
-                .build();
-        // 内存中添加一个用户
-        return new InMemoryUserDetailsManager(user);
-    }
+//    @Bean
+//    public UserDetailsService userDetailsService() {
+//        var user = User.withUsername("user")
+//                // 密文
+//                .password("$2a$10$WMkKx7wwlAwegIOU3MHFfuo9lemdGp380FB12rJ3Sis89V8IA3GiK")
+//                .roles("USER")
+//                .build();
+//        // 内存中添加一个用户
+//        return new InMemoryUserDetailsManager(user);
+//    }
 
     /**
      * Spring Authorization Server 相关配置
@@ -147,33 +153,66 @@ public class SecurityConfiguration {
      * org.springframework.security.oauth2.server.authorization 持久化
      * @return registeredClientRepository
      */
-    @Bean
-    public RegisteredClientRepository registeredClientRepository() {
-        RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("oidc-client")
-                // 密文
-                .clientSecret("$2a$10$WMkKx7wwlAwegIOU3MHFfuo9lemdGp380FB12rJ3Sis89V8IA3GiK")
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .authorizationGrantTypes(authorizationGrantTypes ->
-                        authorizationGrantTypes.addAll(List.of(
-                                AuthorizationGrantType.AUTHORIZATION_CODE,
-                                AuthorizationGrantType.REFRESH_TOKEN
-                        )
-                    )
-                )
-                .redirectUri("http://www.baidu.com")
-                .postLogoutRedirectUri("http://127.0.0.1:8080/")
-                .scopes(strings ->
-                        strings.addAll(List.of(
-                                OidcScopes.OPENID,
-                                OidcScopes.PROFILE
-                        )
-                    )
-                )
-                .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
-                .build();
+//    @Bean
+//    public RegisteredClientRepository registeredClientRepository() {
+//        RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
+//                .clientId("oidc-client")
+//                // 密文
+//                .clientSecret("$2a$10$WMkKx7wwlAwegIOU3MHFfuo9lemdGp380FB12rJ3Sis89V8IA3GiK")
+//                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+//                .authorizationGrantTypes(authorizationGrantTypes ->
+//                        authorizationGrantTypes.addAll(List.of(
+//                                AuthorizationGrantType.AUTHORIZATION_CODE,
+//                                AuthorizationGrantType.REFRESH_TOKEN
+//                        )
+//                    )
+//                )
+//                .redirectUri("http://www.baidu.com")
+//                .postLogoutRedirectUri("http://127.0.0.1:8080/")
+//                .scopes(strings ->
+//                        strings.addAll(List.of(
+//                                OidcScopes.OPENID,
+//                                OidcScopes.PROFILE
+//                        )
+//                    )
+//                )
+//                .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
+//                .build();
+//
+//        return new InMemoryRegisteredClientRepository(registeredClient);
+//    }
 
-        return new InMemoryRegisteredClientRepository(registeredClient);
+    /**
+     * 客户端信息
+     * 对应表：oauth2_registered_client
+     * @return registeredClientRepository
+     */
+    @Bean
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+    public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
+        return new JdbcRegisteredClientRepository(jdbcTemplate);
+    }
+
+    /**
+     * 授权信息
+     * 对应表：oauth2_authorization
+     * @return auth2AuthorizationService
+     */
+    @Bean
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+    public OAuth2AuthorizationService auth2AuthorizationService(JdbcTemplate jdbcTemplate, RegisteredClientRepository registeredClientRepository) {
+        return new JdbcOAuth2AuthorizationService(jdbcTemplate, registeredClientRepository);
+    }
+
+    /**
+     * 授权确认
+     * 对应表：oauth2_authorization_consent
+     * @return oAuth2AuthorizationConsentService
+     */
+    @Bean
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+    public OAuth2AuthorizationConsentService oAuth2AuthorizationConsentService(JdbcTemplate jdbcTemplate, RegisteredClientRepository registeredClientRepository) {
+        return new JdbcOAuth2AuthorizationConsentService(jdbcTemplate, registeredClientRepository);
     }
 
     /**
