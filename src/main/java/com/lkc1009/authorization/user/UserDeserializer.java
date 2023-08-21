@@ -17,7 +17,8 @@ import java.util.Set;
 
 public class UserDeserializer extends JsonDeserializer<User> {
 
-    private static final TypeReference<Set<SimpleGrantedAuthority>> SIMPLE_GRANTED_AUTHORITY_SET = new TypeReference<>() {};
+    private static final TypeReference<Set<SimpleGrantedAuthority>> SIMPLE_GRANTED_AUTHORITY_SET = new TypeReference<>() {
+    };
 
     @Override
     public User deserialize(JsonParser p, DeserializationContext deserializationContext) throws IOException {
@@ -25,7 +26,7 @@ public class UserDeserializer extends JsonDeserializer<User> {
         JsonNode jsonNode = objectMapper.readTree(p);
 
         Set<? extends GrantedAuthority> authorities = objectMapper.convertValue(jsonNode.get("authorities"), SIMPLE_GRANTED_AUTHORITY_SET);
-        JsonNode passwordNode = jsonNode(jsonNode,  "password");
+        JsonNode passwordNode = jsonNode(jsonNode, "password");
 
         String username = jsonNode(jsonNode, "username").asText();
         String password = passwordNode.asText("");

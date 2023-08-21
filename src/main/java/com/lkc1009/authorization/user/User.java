@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,7 +31,7 @@ public class User implements UserDetails {
     @TableField(exist = false)
     private Set<String> roles = new HashSet<>();
 
-    public User(String username, String password, Set<? extends GrantedAuthority> authorities) {
+    public User(String username, String password, @NotNull Set<? extends GrantedAuthority> authorities) {
         this.username = username;
         this.password = password;
         this.roles = authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
