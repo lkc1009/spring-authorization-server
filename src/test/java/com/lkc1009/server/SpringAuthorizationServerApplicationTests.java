@@ -1,4 +1,4 @@
-package com.lkc1009.authorization;
+package com.lkc1009.server;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

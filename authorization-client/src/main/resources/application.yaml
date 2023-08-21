@@ -24,6 +24,7 @@ spring:
             # 客户端 ID
             client-id: messageing-client
             # 客户端 secret
+            # 明文
             client-secret: 123456
             # 客户端认证方式
             client-authentication-method: client_secret_basic

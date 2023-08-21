@@ -1,4 +1,4 @@
-package com.lkc1009.authorization.user;
+package com.lkc1009.server.user;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -13,8 +13,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;

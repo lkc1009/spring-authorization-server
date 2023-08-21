@@ -1,4 +1,4 @@
-package com.lkc1009.authorization.exception;
+package com.lkc1009.server.exception;
 
 import org.springframework.security.core.AuthenticationException;
 

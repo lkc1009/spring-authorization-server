@@ -1,4 +1,4 @@
-package com.lkc1009.authorization.user;
+package com.lkc1009.server.user;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;

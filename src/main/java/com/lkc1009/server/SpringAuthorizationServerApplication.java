@@ -1,4 +1,4 @@
-package com.lkc1009.authorization;
+package com.lkc1009.server;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
