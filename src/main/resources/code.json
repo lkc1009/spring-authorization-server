@@ -1,0 +1,24 @@
+{
+  "id": 1,
+  "username": "user",
+  "password": "$2a$10$WMkKx7wwlAwegIOU3MHFfuo9lemdGp380FB12rJ3Sis89V8IA3GiK",
+  "roles": [
+    "java.util.HashSet",
+    [
+      "USER"
+    ]
+  ],
+  "enabled": true,
+  "authorities": [
+    "java.util.ArrayList",
+    [
+      {
+        "@class": "org.springframework.security.core.authority.SimpleGrantedAuthority",
+        "authority": "ROLE_USER"
+      }
+    ]
+  ],
+  "accountNonExpired": true,
+  "credentialsNonExpired": true,
+  "accountNonLocked": true
+}

@@ -30,6 +30,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.jackson2.CoreJackson2Module;
 import org.springframework.security.jackson2.SecurityJackson2Modules;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -222,6 +223,8 @@ public class SecurityConfiguration {
 
         objectMapper.registerModules(moduleList);
         objectMapper.registerModule(new OAuth2AuthorizationServerJackson2Module());
+
+        // User 自定义序列化
         objectMapper.addMixIn(User.class, UserMixin.class);
 
         oAuth2AuthorizationRowMapper.setObjectMapper(objectMapper);

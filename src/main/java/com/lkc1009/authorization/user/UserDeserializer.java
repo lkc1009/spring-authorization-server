@@ -7,25 +7,29 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+@Slf4j
 public class UserDeserializer extends JsonDeserializer<User> {
-
-    private static final TypeReference<Set<SimpleGrantedAuthority>> SIMPLE_GRANTED_AUTHORITY_SET = new TypeReference<>() {
-    };
 
     @Override
     public User deserialize(JsonParser p, DeserializationContext deserializationContext) throws IOException {
         ObjectMapper objectMapper = (ObjectMapper) p.getCodec();
         JsonNode jsonNode = objectMapper.readTree(p);
 
-        Set<? extends GrantedAuthority> authorities = objectMapper.convertValue(jsonNode.get("authorities"), SIMPLE_GRANTED_AUTHORITY_SET);
+        log.info("jsonNode: {}", jsonNode);
+        log.info("authorities: {}", jsonNode.get("authorities"));
+        Set<? extends GrantedAuthority> authorities = Set.copyOf(objectMapper.convertValue(jsonNode.get("authorities"), new TypeReference<List<SimpleGrantedAuthority>>() {}));
         JsonNode passwordNode = jsonNode(jsonNode, "password");
 
         String username = jsonNode(jsonNode, "username").asText();

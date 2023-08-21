@@ -1,0 +1,98 @@
+{
+  "clientRegistration": {
+    "registrationId": "messageing-client-oidc",
+    "clientId": "messageing-client",
+    "clientSecret": "123456",
+    "clientAuthenticationMethod": {
+      "value": "client_secret_basic"
+    },
+    "authorizationGrantType": {
+      "value": "authorization_code"
+    },
+    "redirectUri": "http://spring-oauth-client:8081/login/oauth2/code/messageing-client-oidc",
+    "scopes": [
+      "profile",
+      "openid"
+    ],
+    "providerDetails": {
+      "authorizationUri": "http://spring-oauth-server:8080/oauth2/authorize",
+      "tokenUri": "http://spring-oauth-server:8080/oauth2/token",
+      "userInfoEndpoint": {
+        "uri": "http://spring-oauth-server:8080/userinfo",
+        "authenticationMethod": {
+          "value": "header"
+        },
+        "userNameAttributeName": "sub"
+      },
+      "jwkSetUri": "http://spring-oauth-server:8080/oauth2/jwks",
+      "issuerUri": "http://spring-oauth-server:8080",
+      "configurationMetadata": {
+        "authorization_endpoint": "http://spring-oauth-server:8080/oauth2/authorize",
+        "token_endpoint": "http://spring-oauth-server:8080/oauth2/token",
+        "introspection_endpoint": "http://spring-oauth-server:8080/oauth2/introspect",
+        "revocation_endpoint": "http://spring-oauth-server:8080/oauth2/revoke",
+        "device_authorization_endpoint": "http://spring-oauth-server:8080/oauth2/device_authorization",
+        "issuer": "http://spring-oauth-server:8080",
+        "jwks_uri": "http://spring-oauth-server:8080/oauth2/jwks",
+        "scopes_supported": [
+          "openid"
+        ],
+        "response_types_supported": [
+          "code"
+        ],
+        "grant_types_supported": [
+          "authorization_code",
+          "client_credentials",
+          "refresh_token",
+          "urn:ietf:params:oauth:grant-type:device_code"
+        ],
+        "token_endpoint_auth_methods_supported": [
+          "client_secret_basic",
+          "client_secret_post",
+          "client_secret_jwt",
+          "private_key_jwt"
+        ],
+        "introspection_endpoint_auth_methods_supported": [
+          "client_secret_basic",
+          "client_secret_post",
+          "client_secret_jwt",
+          "private_key_jwt"
+        ],
+        "revocation_endpoint_auth_methods_supported": [
+          "client_secret_basic",
+          "client_secret_post",
+          "client_secret_jwt",
+          "private_key_jwt"
+        ],
+        "request_uri_parameter_supported": true,
+        "subject_types_supported": [
+          "public"
+        ],
+        "userinfo_endpoint": "http://spring-oauth-server:8080/userinfo",
+        "end_session_endpoint": "http://spring-oauth-server:8080/connect/logout",
+        "id_token_signing_alg_values_supported": [
+          "RS256"
+        ]
+      }
+    },
+    "clientName": "messageing-client"
+  },
+  "principalName": "user",
+  "accessToken": {
+    "tokenValue": "eyJraWQiOiJjZDYzYmNjOS1lNjA2LTQ1MDUtOWZjMS01MjRlNjljYWE5MmUiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwiYXVkIjoibWVzc2FnZWluZy1jbGllbnQiLCJuYmYiOjE2OTI2MTU5NzMsInNjb3BlIjpbIm9wZW5pZCIsInByb2ZpbGUiXSwiaXNzIjoiaHR0cDovL3NwcmluZy1vYXV0aC1zZXJ2ZXI6ODA4MCIsImV4cCI6MTY5MjYxNjI3MywiaWF0IjoxNjkyNjE1OTczfQ.OJ_lQVOmps7kbxaxVO5kBCAXVJ7gGf6XqaWLuKmvTh9-FiqcnyY8iqha7-8W4dcWdnFIJpcjv0cLCd5ub7hi0ybdtrOwZj4AXR4dTTCoHeyI9OIewjRssqtzEW3bWvZQQ8FvosmwLF0dF7ND1xzIo3uv2U93AzCVZ5w44nKjqTZVKGmKGUVC9jtf4gArp5_mNUfkiYS3FrWoCV0istohnYZpbh6mvKxK0oGRbvr-PHNwMMaivMAxXmlwQk5ypkL7F7EcNzt9pFV30IV2vJ83Wv3VgcnnDC1i71MU5OZd4P41d2yp6QQH7rdwdydQVaknX0ffOPI6_e0_pvOJiUSvXQ",
+    "issuedAt": "2023-08-21T11:06:13.901650300Z",
+    "expiresAt": "2023-08-21T11:11:12.901650300Z",
+    "tokenType": {
+      "value": "Bearer"
+    },
+    "scopes": [
+      "openid",
+      "profile"
+    ]
+  },
+  "refreshToken": {
+    "tokenValue": "epvxMY8QD7T6woRNKyCE20WSvaNUS7xL7KnZXtVGdR-a8POC5_E4JmsqEZTOkAgxHxh7qyMwh4KQtYwcku8Vq5qD79lttHSCuDkTuP_-0nDNACWydrsSjI3sAuvwj8Wq",
+    "issuedAt": "2023-08-21T11:06:13.901650300Z",
+    "expiresAt": null
+  }
+}
