@@ -21,7 +21,7 @@ import java.util.Set;
 public class UserDeserializer extends JsonDeserializer<User> {
 
     @Override
-    public User deserialize(JsonParser p, DeserializationContext deserializationContext) throws IOException {
+    public User deserialize(@NotNull JsonParser p, DeserializationContext deserializationContext) throws IOException {
         ObjectMapper objectMapper = (ObjectMapper) p.getCodec();
         JsonNode jsonNode = objectMapper.readTree(p);
 
