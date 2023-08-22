@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ResourceController {
 
-    @GetMapping("/message")
-    public String getMessage() {
-        return "Get /message";
+    @GetMapping("/message1")
+    public String getMessage1() {
+        return "Get /message1";
     }
 
     @GetMapping("/message2")
