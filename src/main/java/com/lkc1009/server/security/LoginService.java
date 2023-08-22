@@ -53,6 +53,7 @@ public class LoginService {
         redisTemplate.opsForValue()
                 .set("login:user:" + user.getId(), token, expiration, TimeUnit.MILLISECONDS);
 
+        log.info("登录成功，用户名：{}，token：{}", user.getUsername(), token);
         return token;
     }
 

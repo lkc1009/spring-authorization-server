@@ -3,6 +3,7 @@ package com.lkc1009.server.user;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.lkc1009.server.exception.AuthenticationSecurityException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 /**
  * 自定义用户验证
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
@@ -37,10 +39,7 @@ public class UserService implements UserDetailsService {
             throw new AuthenticationSecurityException("用户没有权限");
         }
 
-        // 设置权限
-//        List<SimpleGrantedAuthority> simpleGrantedAuthorityList = Stream.of("USER").map(SimpleGrantedAuthority::new)
-//                        .collect(Collectors.toList());
-
+        log.info("用户 {}", user.getUsername());
         user.setRoles(authoritiesSet.stream().map(Authorities::getAuthority).collect(Collectors.toSet()));
         return user;
     }
