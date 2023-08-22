@@ -12,6 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -24,6 +26,7 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
@@ -38,10 +41,25 @@ import java.util.UUID;
 public class AuthorizationDeviceConfiguration {
     private static final String CONSENT_PAGE_URI = "/oauth2/consent";
 
+    /**
+     * 生成 RSA 密钥对
+     */
+    private static KeyPair generateRsaKey() {
+        KeyPair keyPair;
+        try {
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+            keyPairGenerator.initialize(2048);
+            keyPair = keyPairGenerator.generateKeyPair();
+        } catch (Exception ex) {
+            throw new IllegalStateException(ex);
+        }
+        return keyPair;
+    }
+
     @Bean
     @Order(1)
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, RegisteredClientRepository registeredClientRepository,
-                                                   AuthorizationServerSettings authorizationServerSettings) throws Exception {
+    public SecurityFilterChain clientSecurityFilterChain(HttpSecurity httpSecurity, RegisteredClientRepository registeredClientRepository,
+                                                         AuthorizationServerSettings authorizationServerSettings) throws Exception {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(httpSecurity);
 
         // AuthenticationConverter(预处理器)，尝试从 HttpServletRequest 提取客户端凭据，用以构建 OAuth2ClientAuthenticationToken 实例
@@ -85,6 +103,17 @@ public class AuthorizationDeviceConfiguration {
         return httpSecurity.build();
     }
 
+    @Bean
+    public UserDetailsService userDetailsService() {
+        var user = User.withUsername("user")
+                // 密文
+                .password("$2a$10$WMkKx7wwlAwegIOU3MHFfuo9lemdGp380FB12rJ3Sis89V8IA3GiK")
+                .roles("USER")
+                .build();
+        // 内存中添加一个用户
+        return new InMemoryUserDetailsManager(user);
+    }
+
     /**
      * 客户端信息
      * 对应表：oauth2_registered_client
@@ -94,7 +123,6 @@ public class AuthorizationDeviceConfiguration {
     public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
         return new JdbcRegisteredClientRepository(jdbcTemplate);
     }
-
 
     /**
      * 授权信息
@@ -121,7 +149,6 @@ public class AuthorizationDeviceConfiguration {
         return new BCryptPasswordEncoder();
     }
 
-
     /**
      * 配置 JWK，为 JWT(id_token) 提供加密密钥，用于加密/解密或签名/验签
      * JWK 详细见：https://datatracker.ietf.org/doc/html/draft-ietf-jose-json-web-key-41
@@ -137,22 +164,6 @@ public class AuthorizationDeviceConfiguration {
                 .build();
         JWKSet jwkSet = new JWKSet(rsaKey);
         return new ImmutableJWKSet<>(jwkSet);
-    }
-
-    /**
-     * 生成 RSA 密钥对
-     */
-    private static KeyPair generateRsaKey() {
-        KeyPair keyPair;
-        try {
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            keyPairGenerator.initialize(2048);
-            keyPair = keyPairGenerator.generateKeyPair();
-        }
-        catch (Exception ex) {
-            throw new IllegalStateException(ex);
-        }
-        return keyPair;
     }
 
     /**

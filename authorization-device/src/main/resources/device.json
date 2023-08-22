@@ -1,0 +1,7 @@
+{
+  "user_code": "SDHW-GVCL",
+  "device_code": "lIe_CxWvS8X7-beGwLbAbvBeAMdiEpqjsk3b9lpFF4OWDbNQcrVZMYx8nts0ICyau-pne1iMq2G9VT1pzcdFsvuhGCoxMTSwliv_lHgmrK7KqiOzW2xqpvIToxWVKLL0",
+  "verification_uri_complete": "http://spring-oauth-server:8083/activate?user_code=SDHW-GVCL",
+  "verification_uri": "http://spring-oauth-server:8083/activate",
+  "expires_in": 1800
+}
