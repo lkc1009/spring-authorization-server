@@ -1,15 +1,13 @@
 package com.lkc1009.server.security;
 
-//import com.lkc1009.authorization.filter.JwtAuthenticationTokenFilter;
-//import com.lkc1009.authorization.handler.AccessDeniedSecurityHandler;
-//import com.lkc1009.authorization.handler.AuthenticationSecurityEntryPoint;
-//import com.lkc1009.authorization.user.UserService;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lkc1009.server.filter.JwtAuthenticationTokenFilter;
 import com.lkc1009.server.handler.AccessDeniedSecurityHandler;
 import com.lkc1009.server.handler.AuthenticationSecurityEntryPoint;
 import com.lkc1009.server.user.User;
 import com.lkc1009.server.user.UserMixin;
+import com.lkc1009.server.user.UserService;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
@@ -58,10 +56,10 @@ import java.util.UUID;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
-//    private final UserService userService;
+    private final UserService userService;
     private final AccessDeniedSecurityHandler accessDeniedSecurityHandler;
     private final AuthenticationSecurityEntryPoint authenticationSecurityEntryPoint;
-//    private final JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
+    private final JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
     /**
      * 密码加密方式
      * @return passwordEncoder
