@@ -6,6 +6,8 @@ package com.lkc1009.server.security;
 //import com.lkc1009.authorization.user.UserService;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lkc1009.server.handler.AccessDeniedSecurityHandler;
+import com.lkc1009.server.handler.AuthenticationSecurityEntryPoint;
 import com.lkc1009.server.user.User;
 import com.lkc1009.server.user.UserMixin;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -57,8 +59,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 //    private final UserService userService;
-//    private final AccessDeniedSecurityHandler accessDeniedSecurityHandler;
-//    private final AuthenticationSecurityEntryPoint authenticationSecurityEntryPoint;
+    private final AccessDeniedSecurityHandler accessDeniedSecurityHandler;
+    private final AuthenticationSecurityEntryPoint authenticationSecurityEntryPoint;
 //    private final JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
     /**
      * 密码加密方式
@@ -109,6 +111,8 @@ public class SecurityConfiguration {
                                 new LoginUrlAuthenticationEntryPoint("/login"),
                                 new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
                         )
+                                .accessDeniedHandler(accessDeniedSecurityHandler)
+                                .authenticationEntryPoint(authenticationSecurityEntryPoint)
                 )
                 .oauth2ResourceServer(httpSecurityOAuth2ResourceServerConfigurer ->
                         httpSecurityOAuth2ResourceServerConfigurer.jwt(Customizer.withDefaults())
