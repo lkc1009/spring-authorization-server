@@ -1,5 +1,7 @@
 package com.lkc1009.device.security;
 
+import com.lkc1009.device.authorization.DeviceClientAuthenticationConverter;
+import com.lkc1009.device.authorization.DeviceClientAuthenticationProvider;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;

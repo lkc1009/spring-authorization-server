@@ -1,4 +1,4 @@
-package com.lkc1009.device.security;
+package com.lkc1009.device.authorization;
 
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;

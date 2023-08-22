@@ -1,4 +1,4 @@
-package com.lkc1009.device.security;
+package com.lkc1009.device.authorization;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;

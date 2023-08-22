@@ -1,4 +1,4 @@
-package com.lkc1009.device.security;
+package com.lkc1009.device.authorization;
 
 import org.springframework.security.core.Transient;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
