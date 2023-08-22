@@ -1,0 +1,17 @@
+server:
+  address: 127.0.0.1
+  port: 8083
+
+spring:
+  application:
+    name: spring-authorization-ddevice
+
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/security?useUnicode=true&characterEncoding=utf8&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: LKCzka2233
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+logging:
+  level:
+    org.springframework.security: trace
