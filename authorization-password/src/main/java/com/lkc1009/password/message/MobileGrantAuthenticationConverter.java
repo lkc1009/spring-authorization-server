@@ -62,7 +62,7 @@ public class MobileGrantAuthenticationConverter implements AuthenticationConvert
             }
         });
 
-        //返回自定义的 MobileGrantAuthenticationToken 对象
+        // 返回自定义的 MobileGrantAuthenticationToken 对象
         return new MobileGrantAuthenticationToken(authentication, additionalParameters);
     }
 }

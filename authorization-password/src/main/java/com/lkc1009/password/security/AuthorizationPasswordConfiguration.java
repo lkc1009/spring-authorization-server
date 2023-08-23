@@ -6,6 +6,8 @@ import com.lkc1009.password.authorization.DeviceClientAuthenticationConverter;
 import com.lkc1009.password.authorization.DeviceClientAuthenticationProvider;
 import com.lkc1009.password.authorization.PasswordGrantAuthenticationConverter;
 import com.lkc1009.password.authorization.PasswordGrantAuthenticationProvider;
+import com.lkc1009.password.message.MobileGrantAuthenticationConverter;
+import com.lkc1009.password.message.MobileGrantAuthenticationProvider;
 import com.lkc1009.password.user.User;
 import com.lkc1009.password.user.UserMixin;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -110,7 +112,17 @@ public class AuthorizationPasswordConfiguration {
                                 .accessTokenRequestConverter(new PasswordGrantAuthenticationConverter())
                                 .authenticationProvider(new PasswordGrantAuthenticationProvider(
                                         oAuth2AuthorizationService, oAuth2TokenGenerator
-                                )))
+                                        )
+                                )
+                )
+                .tokenEndpoint(oAuth2TokenEndpointConfigurer ->
+                        oAuth2TokenEndpointConfigurer
+                                .accessTokenRequestConverter(new MobileGrantAuthenticationConverter())
+                                .authenticationProvider(new MobileGrantAuthenticationProvider(
+                                        oAuth2AuthorizationService, oAuth2TokenGenerator
+                                        )
+                                )
+                )
                 .oidc(Customizer.withDefaults());
 
         httpSecurity
