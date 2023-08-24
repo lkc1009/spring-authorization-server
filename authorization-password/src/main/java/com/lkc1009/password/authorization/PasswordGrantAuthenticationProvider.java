@@ -118,7 +118,7 @@ public class PasswordGrantAuthenticationProvider implements AuthenticationProvid
         // Initialize the DefaultOAuth2TokenContext
         DefaultOAuth2TokenContext.Builder defaultOAuth2TokenContext = DefaultOAuth2TokenContext.builder()
                 .registeredClient(registeredClient)
-                .principal(oAuth2ClientAuthenticationToken)
+                .principal(usernamePasswordAuthenticationToken)
                 .authorizationServerContext(AuthorizationServerContextHolder.getContext())
                 .authorizedScopes(requestScopeSet)
                 .authorizationGrantType(authorizationGrantType)
@@ -183,7 +183,7 @@ public class PasswordGrantAuthenticationProvider implements AuthenticationProvid
                     .authorization(oauth2AuthorizationBuilder.build())
                     .build();
 
-            OAuth2Token idToken = oAuth2TokenGenerator.generate(oAuth2TokenContext);
+            OAuth2Token idToken = this.oAuth2TokenGenerator.generate(oAuth2TokenContext);
 
             if (!(idToken instanceof Jwt)) {
                 OAuth2Error error = new OAuth2Error(OAuth2ErrorCodes.SERVER_ERROR,
@@ -193,7 +193,7 @@ public class PasswordGrantAuthenticationProvider implements AuthenticationProvid
 
             oidcIdToken = new OidcIdToken(idToken.getTokenValue(), idToken.getIssuedAt(),
                     idToken.getExpiresAt(), ((Jwt) idToken).getClaims());
-            oauth2AuthorizationBuilder.token(idToken, (metadata) -> {
+            oauth2AuthorizationBuilder.token(oidcIdToken, (metadata) -> {
                         metadata.put(OAuth2Authorization.Token.CLAIMS_METADATA_NAME, oidcIdToken.getClaims());
                     }
             );

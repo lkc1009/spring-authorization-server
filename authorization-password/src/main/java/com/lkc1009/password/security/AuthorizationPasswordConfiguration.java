@@ -10,12 +10,15 @@ import com.lkc1009.password.message.MobileGrantAuthenticationConverter;
 import com.lkc1009.password.message.MobileGrantAuthenticationProvider;
 import com.lkc1009.password.user.User;
 import com.lkc1009.password.user.UserMixin;
+import com.lkc1009.password.user.UserService;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jwt.JWTClaimsSet;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.util.StandardSessionIdGenerator;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
@@ -26,6 +29,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -54,13 +59,14 @@ import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Instant;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
+@Slf4j
 @Configuration
+@RequiredArgsConstructor
 public class AuthorizationPasswordConfiguration {
     private static final String CUSTOM_CONSENT_PAGE_URI = "/oauth2/consent";
+    private final UserService userService;
 
     /**
      * 生成 RSA 密钥对
@@ -246,8 +252,9 @@ public class AuthorizationPasswordConfiguration {
      * 配置 token 生成器
      */
     @Bean
-    OAuth2TokenGenerator<?> tokenGenerator(JWKSource<SecurityContext> jwkSource) {
+    public OAuth2TokenGenerator<?> tokenGenerator(JWKSource<SecurityContext> jwkSource) {
         JwtGenerator jwtGenerator = new JwtGenerator(new NimbusJwtEncoder(jwkSource));
+        jwtGenerator.setJwtCustomizer(oAuth2TokenCustomizer());
         OAuth2AccessTokenGenerator accessTokenGenerator = new OAuth2AccessTokenGenerator();
         OAuth2RefreshTokenGenerator refreshTokenGenerator = new OAuth2RefreshTokenGenerator();
         return new DelegatingOAuth2TokenGenerator(
@@ -255,17 +262,36 @@ public class AuthorizationPasswordConfiguration {
     }
 
     @Bean
-    public OAuth2TokenCustomizer<JwtEncodingContext> jwtEncodingContextOAuth2TokenCustomizer() {
+    public OAuth2TokenCustomizer<JwtEncodingContext> oAuth2TokenCustomizer() {
         return context -> {
             JwsHeader.Builder jwsHeaderBuilder = context.getJwsHeader();
             JwtClaimsSet.Builder jwtClaimsSet = context.getClaims();
 
+            UserDetails userDetails = userService.loadUserByUsername(context.getPrincipal().getName());
+
             if (context.getTokenType().equals(OAuth2TokenType.ACCESS_TOKEN)) {
+
+                jwtClaimsSet.claims(claimsConsumer -> {
+                    claimsConsumer.merge("scope", userDetails.getAuthorities(), (scope, authorities) -> {
+                        Set<String> scopeSet = (Set<String>) scope;
+                        Collection<SimpleGrantedAuthority> simpleGrantedAuthorities = (Collection<SimpleGrantedAuthority>) authorities;
+
+                        simpleGrantedAuthorities.forEach(simpleGrantedAuthority -> {
+                            if (!scopeSet.contains(simpleGrantedAuthority.getAuthority())) {
+                                scopeSet.add(simpleGrantedAuthority.getAuthority());
+                            }
+                        });
+
+                        return scopeSet;
+                    });
+                });
 
             } else if (context.getTokenType().getValue().equals(OidcParameterNames.ID_TOKEN)) {
                 jwtClaimsSet.claim(IdTokenClaimNames.AUTH_TIME, Date.from(Instant.now()));
                 StandardSessionIdGenerator standardSessionIdGenerator = new StandardSessionIdGenerator();
                 jwtClaimsSet.claim("sid", standardSessionIdGenerator.generateSessionId());
+
+                // other user message
             }
         };
     }
