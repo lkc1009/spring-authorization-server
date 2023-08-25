@@ -8,6 +8,9 @@ import com.lkc1009.password.authorization.PasswordGrantAuthenticationConverter;
 import com.lkc1009.password.authorization.PasswordGrantAuthenticationProvider;
 import com.lkc1009.password.message.MobileGrantAuthenticationConverter;
 import com.lkc1009.password.message.MobileGrantAuthenticationProvider;
+import com.lkc1009.password.oidc.OidcUserInfoAuthenticationConverter;
+import com.lkc1009.password.oidc.OidcUserInfoAuthenticationProvider;
+import com.lkc1009.password.oidc.OidcUserInfoService;
 import com.lkc1009.password.user.User;
 import com.lkc1009.password.user.UserMixin;
 import com.lkc1009.password.user.UserService;
@@ -67,6 +70,7 @@ import java.util.*;
 public class AuthorizationPasswordConfiguration {
     private static final String CUSTOM_CONSENT_PAGE_URI = "/oauth2/consent";
     private final UserService userService;
+    private final OidcUserInfoService oidcUserInfoService;
 
     /**
      * 生成 RSA 密钥对
@@ -134,7 +138,15 @@ public class AuthorizationPasswordConfiguration {
                                         )
                                 )
                 )
-                .oidc(Customizer.withDefaults());
+                // oidc自定义
+                .oidc(oidcConfigurer ->
+                        oidcConfigurer
+                                .userInfoEndpoint(oidcUserInfoEndpointConfigurer ->
+                                        oidcUserInfoEndpointConfigurer
+                                                .userInfoRequestConverter(new OidcUserInfoAuthenticationConverter(oidcUserInfoService))
+                                                .authenticationProvider(new OidcUserInfoAuthenticationProvider(oAuth2AuthorizationService))
+                                )
+                );
 
         httpSecurity
                 .exceptionHandling(httpSecurityExceptionHandlingConfigurer ->
