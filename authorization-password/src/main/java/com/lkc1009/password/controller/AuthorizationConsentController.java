@@ -1,5 +1,6 @@
 package com.lkc1009.password.controller;
 
+import com.lkc1009.password.user.LoginService;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
@@ -22,6 +24,12 @@ import java.util.*;
 public class AuthorizationConsentController {
     private final RegisteredClientRepository registeredClientRepository;
     private final OAuth2AuthorizationConsentService authorizationConsentService;
+    private final LoginService loginService;
+
+    @PostMapping("/login")
+    public String login(String username, String password) {
+        return loginService.login(username, password);
+    }
 
     @GetMapping(value = "/oauth2/consent")
     public String consent(@NotNull Principal principal, Model model,
